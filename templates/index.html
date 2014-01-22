@@ -2,79 +2,49 @@
 
 <%block name="scripts">
 <script>
-    $(function(){
-    $.fn.toggleButton = function( options ) {
-      var settings = $.extend({
-	  iconPlay: "ui-icon-play",
-	  iconStop: "ui-icon-stop",
-	  delay:1000,
-	  fn:null
-      }, options );
-      
-      return this.each(function(){
-      	isPlaying = false;
-	function repeat(){
-	  if (!isPlaying){
-	    return;
-	  }
-	  settings.fn();
-	  setTimeout(repeat,settings.delay);
-	};
-	$(this).click(function(){
-	  if (isPlaying){
-	    $(this).button({icons: {primary:settings.iconPlay},text:false});
-	    isPlaying = !isPlaying;
-	  } else {
-	    $(this).button({icons: {primary:settings.iconStop},text:false});
-	    isPlaying = !isPlaying;
-	    repeat();
-	  }
-	});
+var initDiskData = [
+    { label: "Used ${used/1024/1024} MiB",  data: 1},
+    { label: "Free ${free/1024/1024} MiB",  data: 1}
+];
+
+function updateTop(){
+  $("#top").load("/top/");
+}
+
+chartDiskOptions = {
+  series: {
+    pie: {
+      innerRadius: 0.5,
+      show: true
+    }
+  }
+};
+
+function updateDisk(){
+    $.ajax({
+      url: "/disk/",
+      dataType: "json",
+      success :
+	function(data) {
+	    console.log(data);
+	    $.plot("#chartDisk",data, chartDiskOptions);
+	}
       });
-      };
-    });
-    
-    function updateTop(){
-      console.log("top");
-      $("#top").load("/top/");
-    }
-    
-    function pollTop(){
-      if (!topPlayOn){
-	return;
-      }
-      updateTop();
-      setTimeout("pollTop()",1000);
-    }
-    
-    function setIconButton(id,icon){
-    $(id).button({icons: { primary: icon}, text: false});
-    }
+}
     
   $(function() {
+
     
-    var data = [
-    	{ label: "Used ${used/1024/1024} MiB",  data: ${used}},
-    	{ label: "Free ${free/1024/1024} MiB",  data: ${free}},
-    ];
     //$( "#dialog" ).dialog();
     $( "#accordion" ).accordion();
-    $.plot('#chartDisk', data, {
-    series: {
-        pie: {
-            innerRadius: 0.5,
-            show: true
-        }
-    }});
+    $.plot('#chartDisk', initDiskData, chartDiskOptions);
     setIconButton("#btnTop","ui-icon-refresh");
     setIconButton("#btnTopPlay","ui-icon-play");
+    setIconButton("#btnDiskPlay","ui-icon-play");
 
     $("#btnTop").click(function(){updateTop()});
-
-    topPlayOn=false
-    $("#btnTopPlay").button({ cons: { primary: "ui-icon-play"}, text: false})
     $("#btnTopPlay").toggleButton({fn:updateTop});
-
+    $("#btnDiskPlay").toggleButton({fn:updateDisk,delay:2500});
     
   });
 </script>
@@ -91,16 +61,18 @@
 <div id="accordion" class="centered page-width">
   <h3>Disk Usage</h3>
   <div>
+   <div id="btnDiskPlay" class="mini-button-right" title="Auto refresh disk usage"></div>
    <div id="chartDisk" class="centered chart-size"></div>
   </div>
   <h3>CPU Usage</h3>
   <div>
+  <p>Todo.</p>
   <div id="chartCpu" class="centered chart-size"></div>
   </div>
   <h3>#top</h3>
   <div>
-  <div id="btnTop"     class="mini-button-right" title="Refresh"></div>
-  <div id="btnTopPlay" class="mini-button-right" title="Auto refresh"></div>
+  <div id="btnTop"     class="mini-button-right" title="Refresh top"></div>
+  <div id="btnTopPlay" class="mini-button-right" title="Auto refresh top"></div>
   <pre id="top">
   ${top}
   </pre>

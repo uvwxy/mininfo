@@ -2,6 +2,8 @@
 import cherrypy
 import os
 import sysinfo as sysinfo
+import simplejson
+from cherrypy import tools
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
@@ -25,6 +27,17 @@ class HelloWorld(object):
   @cherrypy.expose
   def top(self, numlines=20, *args, **kw):
     return sysinfo.top(numlines);
+  
+  @cherrypy.expose
+  @cherrypy.tools.json_out()
+  @cherrypy.tools.json_in()
+  def disk(self):
+    total,used,free = sysinfo.diskUsage("/")
+    result = {"label":"Used " + str(used/1024/1024) + " MiB", "data":used},{"label":"Free " + str(free/1024/1024) +" MiB", "data":free}
+    return result
+    	
+    	
+# server start and configuration
 conf = {
     '/media':
                 {'tools.staticdir.on': True,

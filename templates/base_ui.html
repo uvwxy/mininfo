@@ -32,7 +32,39 @@ body { font-size: 75%;
 <script src="media/flot/jquery.flot.js"></script>
 <script src="media/flot/jquery.flot.pie.js"></script>
 <script>
+function setIconButton(id,icon){
+  $(id).button({icons: { primary: icon}, text: false});
+}
 $(function(){
+  $.fn.toggleButton = function( options ) {
+    var settings = $.extend({
+	iconPlay: "ui-icon-play",
+	iconStop: "ui-icon-stop",
+	delay:1000,
+	fn:null
+    }, options );
+    
+    return this.each(function(){
+      isPlaying = false;
+      function repeat(){
+	if (!isPlaying){
+	  return;
+	}
+	settings.fn();
+	setTimeout(repeat,settings.delay);
+      };
+      $(this).click(function(){
+	if (isPlaying){
+	  $(this).button({icons: {primary:settings.iconPlay},text:false});
+	  isPlaying = !isPlaying;
+	} else {
+	  $(this).button({icons: {primary:settings.iconStop},text:false});
+	  isPlaying = !isPlaying;
+	  repeat();
+	}
+      });
+    });
+  };
   $( document ).tooltip();
 });
 </script>
