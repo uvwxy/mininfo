@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>
+<%block name="title">
+    Le Page
+</%block>
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<link rel="stylesheet" href="media/jQueryUiThemes/flick/jquery-ui-1.10.4.custom.min.css" />
+<!-- This fixes the very large default jQuerUi sizes -->
+<style type="text/css">
+body { font-size: 75%;
+  font-family: Arial, Helvetica, sans-serif;}
+/*uvwxy:general chart settings*/
+.centered{
+ display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.chart-size {
+  width:600px;height:300px;
+}
+.page-width {
+  width:920px;
+}
+.mini-button-right {
+ width:32px;height:32px;float:right;
+}
+</style>
+<script src="media/jquery-1.10.2.min.js"></script>
+<script src="media/jquery-ui-1.10.4.custom.min.js"></script>
+<script src="media/flot/jquery.flot.js"></script>
+<script src="media/flot/jquery.flot.pie.js"></script>
+<script>
+$(function(){
+  $( document ).tooltip();
+});
+</script>
+<%block name="scripts">
+</%block>
+</head>
+<body>
+<div> 
+  <div class="content-head ui-widget-header centered page-width">
+    <h1 style="margin-left:24px;">
+    <%block name="header">
+      Welcome to le Page
+    </%block>
+   </h1>
+  </div> 
+  <div class="centered ">
+    ${self.body()}
+  </div> 
+  <div class="centered page-width ui-widget-content">
+    <%block name="footer">
+      Footer
+    </%block>
+  </div> 
+</div>
+</body>
+</html>

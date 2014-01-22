@@ -1,0 +1,109 @@
+<%inherit file="base_ui.html"/>
+
+<%block name="scripts">
+<script>
+    $(function(){
+    $.fn.toggleButton = function( options ) {
+      var settings = $.extend({
+	  iconPlay: "ui-icon-play",
+	  iconStop: "ui-icon-stop",
+	  delay:1000,
+	  fn:null
+      }, options );
+      
+      return this.each(function(){
+      	isPlaying = false;
+	function repeat(){
+	  if (!isPlaying){
+	    return;
+	  }
+	  settings.fn();
+	  setTimeout(repeat,settings.delay);
+	};
+	$(this).click(function(){
+	  if (isPlaying){
+	    $(this).button({icons: {primary:settings.iconPlay},text:false});
+	    isPlaying = !isPlaying;
+	  } else {
+	    $(this).button({icons: {primary:settings.iconStop},text:false});
+	    isPlaying = !isPlaying;
+	    repeat();
+	  }
+	});
+      });
+      };
+    });
+    
+    function updateTop(){
+      console.log("top");
+      $("#top").load("/top/");
+    }
+    
+    function pollTop(){
+      if (!topPlayOn){
+	return;
+      }
+      updateTop();
+      setTimeout("pollTop()",1000);
+    }
+    
+    function setIconButton(id,icon){
+    $(id).button({icons: { primary: icon}, text: false});
+    }
+    
+  $(function() {
+    
+    var data = [
+    	{ label: "Used ${used/1024/1024} MiB",  data: ${used}},
+    	{ label: "Free ${free/1024/1024} MiB",  data: ${free}},
+    ];
+    //$( "#dialog" ).dialog();
+    $( "#accordion" ).accordion();
+    $.plot('#chartDisk', data, {
+    series: {
+        pie: {
+            innerRadius: 0.5,
+            show: true
+        }
+    }});
+    setIconButton("#btnTop","ui-icon-refresh");
+    setIconButton("#btnTopPlay","ui-icon-play");
+
+    $("#btnTop").click(function(){updateTop()});
+
+    topPlayOn=false
+    $("#btnTopPlay").button({ cons: { primary: "ui-icon-play"}, text: false})
+    $("#btnTopPlay").toggleButton({fn:updateTop});
+
+    
+  });
+</script>
+</%block>
+
+<%block name="header">
+    Welcome to: ${title}
+</%block>
+<!--
+<div id="dialog" title="Welcome to Le Server">
+  <p>Hafe fun!</p>
+</div>-->
+
+<div id="accordion" class="centered page-width">
+  <h3>Disk Usage</h3>
+  <div>
+   <div id="chartDisk" class="centered chart-size"></div>
+  </div>
+  <h3>CPU Usage</h3>
+  <div>
+  <div id="chartCpu" class="centered chart-size"></div>
+  </div>
+  <h3>#top</h3>
+  <div>
+  <div id="btnTop"     class="mini-button-right" title="Refresh"></div>
+  <div id="btnTopPlay" class="mini-button-right" title="Auto refresh"></div>
+  <pre id="top">
+  ${top}
+  </pre>
+  </div>
+</div>
+
