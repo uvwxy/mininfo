@@ -44,7 +44,7 @@ conf = {
                  'tools.staticdir.dir': dirMedia,
                 },
     'global': {
-        'server.socket_host': '192.168.1.109',
+        'server.socket_host': '0.0.0.0',
         'server.socket_port': 8080,
     }
 }
